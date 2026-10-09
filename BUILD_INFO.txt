@@ -1,0 +1,46 @@
+SHADOWBORNE MART Z5 — rebuilt feature update
+
+- Python 3.12 / aiogram 3 / SQLite.
+- Coin price: ₦25 per coin, with standard and Premium bonus packs.
+- Premium plans: 30 days ₦2,500; 60 days ₦5,000; 90 days ₦7,500; 1 year ₦14,500; lifetime ₦25,000.
+- Refund requests: buyer must provide a clear reason and request between 2 and 5 hours after purchase; approved refund blocks that buyer from repurchasing the same product for 10 days.
+- Referral, redeem, check-in, purchased, and partner seed coins are not withdrawable. Withdrawals are based on net sale-earned coins only.
+- Seller withdrawal account-age gate: 7 days by default; duplicate screenshot file IDs are rejected for coin requests.
+- Broadcasts are throttled; FSM conversations persist in a companion SQLite database across restarts.
+- Wishlist plus price-drop alerts triggered by the admin /setprice command.
+- Pro Seller tier: 10% commission, assignable by admin with /proseller <telegram_user_id>.
+- MONOTECH partner: set MONOTECH_USER_ID in deployment environment. It is added as a co-admin, receives Pro tier/lifetime access and a one-time 2,000 spend-only coin balance, and receives 100% of coin/Stars sale allocation.
+- OPay destination: 8063258989, Augustine Uchechi Chinaecherem.
+
+Important Telegram Stars limitation: Telegram's Bot API does not provide a method for a bot to directly credit or transfer earned Stars into another user's personal Telegram Stars balance. Seller Stars are recorded in the marketplace ledger, but direct seller-account credit/transfer needs a separate supported payout arrangement; this project does not falsely mark that as completed.
+
+Tests: Python compilation and 7 database smoke tests pass in the build environment. Full Telegram live API/payment testing must be performed after configuring the real token and partner Telegram ID.
+
+
+Z6 owner-fix update
+- Fixed admin_only decorator (all admin handlers crashed with TypeError) and added owner_only.
+- 🛠️ Admin button now opens the admin panel. /myid shows your ID and role.
+- Owner + co-admin get lifetime Premium automatically (startup + first /start).
+- New upload wizard (handlers_upload.py): cover, author, chapters. Admins publish instantly; Premium sellers go to review.
+- Seller Panel visible to all, works only for Premium members (auto-activated).
+- Owner-only: Grant Premium, Credit Coins, Active Users, Ban/Unban by ID or @username.
+- Category double-emoji fixed (existing databases are upgraded in place). Procfile is now `worker:`.
+- Removed .env from the package (it contained the bot token). Use .env.example / Railway Variables.
+
+
+Z7 update
+- FIXED root cause of dead buttons: fsm_storage.py passed aiogram State objects to sqlite (ProgrammingError) so Redeem, Buy Coins, Premium tiers and the upload wizard crashed silently.
+- Premium tiers + coin packs now show OPay details + exact amount + "Message Admin" DM button; owner gets a notification with a one-tap Grant/Credit button.
+- Guided "Create Code" (coins per user, number of users). Redeem prompt text fixed.
+- Buy Coins hidden for admins. Seller ID only on becoming a seller (old IDs removed from non-sellers). "Become a Seller" button.
+- Wishlist button on product pages, Support opens your DM, global error handler (no more endless "loading"), /myid shows a Database ID for spotting duplicate bot instances.
+
+Z7 FIX PATCH — PAYMENT SAFETY AND PARTNER ATTRIBUTION
+- Added persistent manual_payment_requests records for coin and Premium payments.
+- Manual payment approvals are atomic and idempotent; the same request cannot credit coins or grant Premium twice.
+- Approval is blocked until payment proof is uploaded in the bot chat.
+- Payment screenshots/documents are sent to the owner for review, and Telegram file_unique_id is used to detect duplicate proof across manual requests.
+- Requests without proof expire from the one-pending-request gate after one hour, so an abandoned upload does not block a user forever.
+- MONOTECH admin uploads are attributed to the MONOTECH seller account; main-owner admin uploads remain owner-managed catalog products.
+- Database schema version bumped to 6 with safe additive migrations.
+- Added regression tests for proof-required approvals, duplicate proof, and one-time credit/Premium granting.

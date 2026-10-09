@@ -1,0 +1,3 @@
+-- Initial schema is created by Database.init_db().
+-- This marker exists so deployment tooling has an explicit migration version.
+-- Do not execute this file independently; use: python migrate.py
